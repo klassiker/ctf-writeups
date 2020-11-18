@@ -53,6 +53,8 @@ If you have any questions, suggestions or improvements feel free to collaborate 
 ### Cryptography
 
  - [Newark Academy CTF - Random Number Generator](2020/newark-academy/random-number-generator.md) Bruteforcing the time-based seed of a PRNG in python to predict the next values
+ - [Ledger Donjon CTF - One Time-Based Signature](2020/ledger-donjon/one-time-based-signature.md) Bruteforcing the time-based seed of a math/rand in golang to restore a private key
+ - [Ledger Donjon CTF - Secret RNG](2020/ledger-donjon/secret-rng.md) Predicting golang math/rand by observing the output
  - [Square CTF - Hash My Awesome Commands](2020/square/hash-my-awesome-commands.md) Timing attack on a bad implementation of HMAC verification
  - [Affinity CTF Lite - BreakMe](2020/affinity-lite/crypto/breakme.md) Prime factorization of a weak RSA key
  - [Affinity CTF Lite - Collision Course](2020/affinity-lite/crypto/collision-course.md) md5sum collision using HashClash
