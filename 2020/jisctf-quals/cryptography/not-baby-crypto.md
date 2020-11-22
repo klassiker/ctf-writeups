@@ -1,0 +1,154 @@
+# Not baby crypto
+
+## Task
+
+File: N0T-B4By.zip
+
+## Solution
+
+We have the following code:
+
+```python
+import os
+from os import listdir
+from os.path import isfile, join
+import random
+
+data_path = 'plainData'
+
+def encrypt(key):
+    for f in listdir(data_path):
+        file = join(data_path, f)
+        if isfile(file):
+            with open(file, 'r') as ff:
+                for data in ff:
+                    enc_file = join(data_path, f.split('.')[0] + '.enc')
+                    with open(enc_file, 'w') as fff:
+                        encrypted = list()
+                        encrypted2 = list()
+
+                        for c in data:
+                            cb = int(int(bin(ord(c)), 2) ^ int(bin(key), 2))
+                            encrypted.append(cb)
+                        for l in encrypted:
+                            cb = int(int(bin(int(l)), 2) ^ int(bin(key * 2), 2))
+                            encrypted2.append(cb)
+                        for l in encrypted2:
+                            fff.write(str(l))
+
+                        fff.close()
+                ff.close()
+
+
+def generate_key():
+    ran = os.urandom(32).hex()
+    key_list = list()
+    n = 2
+    key = int()
+    [key_list.append(ran[i:i + n]) for i in range(0, len(ran), n)]
+    for i in key_list:
+        v = int(i, 16) % 10
+        tmp = str(key) + str(v)
+        key = int(tmp)
+    return key
+
+def main():
+    print('Starting the encryption process..')
+
+    x = generate_key()
+    encrypt(x)
+
+
+if __name__ == '__main__':
+    main()
+```
+
+We can simplify that:
+
+```python
+data = "JISCTF{}"
+
+def encryptTwo(key):
+    f = []
+    for data in flag:
+        encrypted = list()
+        for c in data:
+            cb = ord(c) ^ key ^ (key * 2)
+            f.append(str(cb))
+    return f
+
+def main():
+    x = generate_key()
+    assert(encrypt(x) == encryptTwo(x))
+```
+
+We also have `flag.enc`:
+
+```
+33385136436860330228033637194122333851364368603302280336371941213338513643686033022803363719413133385136436860330228033637194115333851364368603302280336371941323338513643686033022803363719411833385136436860330228033637194171333851364368603302280336371941303338513643686033022803363719422833385136436860330228033637194126333851364368603302280336371941163338513643686033022803363719422433385136436860330228033637194125333851364368603302280336371941433338513643686033022803363719412633385136436860330228033637194133333851364368603302280336371941253338513643686033022803363719411433385136436860330228033637194227333851364368603302280336371941303338513643686033022803363719413133385136436860330228033637194143333851364368603302280336371942283338513643686033022803363719413133385136436860330228033637194143333851364368603302280336371941233338513643686033022803363719422733385136436860330228033637194137333851364368603302280336371941433338513643686033022803363719420933385136436860330228033637194209333851364368603302280336371942093338513643686033022803363719417333385136436860330228033637194186
+```
+
+If you look closely, there is a repeating pattern. Each char (a single byte) is XORed with 16 bytes (the key). This means the first 15 bytes are always the same.
+
+```
+33385136436860330228033637194122
+33385136436860330228033637194121
+33385136436860330228033637194131
+33385136436860330228033637194115
+33385136436860330228033637194132
+33385136436860330228033637194118
+33385136436860330228033637194171
+33385136436860330228033637194130
+33385136436860330228033637194228
+33385136436860330228033637194126
+33385136436860330228033637194116
+33385136436860330228033637194224
+33385136436860330228033637194125
+33385136436860330228033637194143
+33385136436860330228033637194126
+33385136436860330228033637194133
+33385136436860330228033637194125
+33385136436860330228033637194114
+33385136436860330228033637194227
+33385136436860330228033637194130
+33385136436860330228033637194131
+33385136436860330228033637194143
+33385136436860330228033637194228
+33385136436860330228033637194131
+33385136436860330228033637194143
+33385136436860330228033637194123
+33385136436860330228033637194227
+33385136436860330228033637194137
+33385136436860330228033637194143
+33385136436860330228033637194209
+33385136436860330228033637194209
+33385136436860330228033637194209
+33385136436860330228033637194173
+33385136436860330228033637194186
+```
+
+The encryption part `cb = ord(c) ^ key ^ (key * 2)` uses always the same key, let's define `x = key ^ (key * 2)`. If we now XOR the first line with our guessed first char `J`, we should get `x`. If we then XOR every other char with `x` we should get the flag:
+
+```python
+flag = "JISCFT{}"
+ct = []
+with open("flag.enc", "r") as f:
+    d = f.read().split("\n")
+    d.pop()
+    [ct.append(int(x)) for x in d]
+
+key = ct[0] ^ ord(flag[0])
+
+def decrypt(text):
+    o = []
+    for c in text:
+        o.append(chr(c ^ key))
+    return ''.join(o)
+```
+
+Running it:
+
+```bash
+$ python main.py
+JISCTF{R4ND0M_NUMB3RS_4S_K3Y_!!!}
+```
